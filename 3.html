@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>filter · e‑commerce ui | price, color, brand, ratings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #f4f6fa;
+      padding: 2rem 1.5rem;
+      color: #141b29;
+    }
+
+    .shop-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+      overflow: hidden;
+      padding: 2rem 2rem 2.5rem 2rem;
+    }
+
+    /* header */
+    .shop-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+    .shop-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(150deg, #0f2b4b, #264d7c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .view-options {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background: #f0f4fc;
+      padding: 0.3rem;
+      border-radius: 50px;
+    }
+    .view-btn {
+      padding: 0.5rem 1.4rem;
+      border-radius: 40px;
+      border: none;
+      background: transparent;
+      font-weight: 500;
+      color: #335e8e;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .view-btn.active {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,60,120,0.1);
+      color: #0e3152;
+    }
+
+    /* main layout: filter sidebar + product grid */
+    .shop-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ---------- FILTER SIDEBAR (sticky, advanced) ---------- */
+    .filter-sidebar {
+      background: #f9fcff;
+      border-radius: 2rem;
+      padding: 1.8rem 1.6rem;
+      border: 1px solid #dee9f5;
+      position: sticky;
+      top: 1.5rem;
+      align-self: start;
+      transition: box-shadow 0.2s;
+    }
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      font-weight: 600;
+    }
+    .filter-header h3 {
+      font-size: 1.5rem;
+      color: #142c44;
+    }
+    .clear-all {
+      background: none;
+      border: none;
+      color: #2e6a9e;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: underline dotted;
+    }
+
+    /* filter section common */
+    .filter-section {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #d3e2f5;
+      padding-bottom: 1.5rem;
+    }
+    .filter-section:last-of-type {
+      border-bottom: none;
+    }
+    .filter-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #1c405e;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* --- PRICE RANGE (double slider simulation) --- */
+    .price-range-display {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      background: #eef4fc;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-weight: 500;
+    }
+    .price-inputs {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .price-input {
+      flex: 1;
+      background: white;
+      border: 1px solid #cbdaf0;
+      border-radius: 40px;
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+    }
+    .price-input span {
+      color: #446e9a;
+      margin-right: 0.3rem;
+    }
+    .price-input input {
+      border: none;
+      width: 80px;
+      font-weight: 600;
+      outline: none;
+      background: transparent;
+    }
+    /* range slider visual (dummy + real range) */
+    .range-slider {
+      position: relative;
+      height: 6px;
+      background: #c6daf5;
+      border-radius: 10px;
+      margin: 1.2rem 0 0.5rem;
+    }
+    .range-fill {
+      position: absolute;
+      height: 6px;
+      width: 60%; /* demo fill  (min:20% / max:80%) */
+      background: #1d5f9e;
+      border-radius: 10px;
+      left: 20%;
+    }
+
+    /* --- COLOR PALETTE (grid of swatches) --- */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.7rem;
+      margin-top: 0.5rem;
+    }
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 12px;
+      padding: 0.4rem 0.2rem;
+      transition: 0.1s;
+      border: 2px solid transparent;
+    }
+    .color-swatch.selected {
+      border-color: #0f4b88;
+      background: #ecf3ff;
+    }
+    .swatch-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 40px;
+      margin-bottom: 0.2rem;
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .swatch-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #2c4a6e;
+    }
+
+    /* --- BRAND SELECTION (checkboxes / custom) --- */
+    .brand-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+    }
+    .brand-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 500;
+      color: #1d3c5b;
+    }
+    .brand-item input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: #1d5f9e;
+      border-radius: 4px;
+    }
+    .brand-count {
+      margin-left: auto;
+      color: #6b8db0;
+      font-size: 0.9rem;
+    }
+
+    /* --- CUSTOMER RATINGS (stars) --- */
+    .rating-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .rating-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-weight: 450;
+    }
+    .rating-option input[type="radio"] {
+      accent-color: #1e5791;
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+    .stars {
+      display: flex;
+      gap: 0.15rem;
+      color: #f5b342;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+    }
+    .stars .inactive {
+      color: #cddbe9;
+    }
+    .rating-label {
+      margin-left: 0.3rem;
+      color: #244868;
+    }
+
+    /* ---------- PRODUCT GRID (results) ---------- */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 1.8rem;
+      padding: 1.2rem 1.2rem 1.5rem;
+      border: 1px solid #e7effb;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 6px 12px -6px rgba(0,40,70,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 22px 30px -12px rgba(0,80,140,0.2);
+      border-color: #bfd9fc;
+    }
+
+    .product-image {
+      background: #f2f7ff;
+      border-radius: 1.5rem;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      border: 1px solid #dbe8fc;
+      margin-bottom: 1rem;
+    }
+
+    .product-brand {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #527ea5;
+      font-weight: 600;
+    }
+
+    .product-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 0.3rem 0 0.4rem;
+      color: #112b41;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin: 0.5rem 0;
+    }
+    .product-rating .stars-small {
+      color: #f6b23e;
+      font-size: 1rem;
+    }
+    .reviews {
+      color: #617e9e;
+      font-size: 0.8rem;
+    }
+
+    .product-price {
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #123456;
+      margin: 0.5rem 0 0.7rem;
+    }
+    .product-colors {
+      display: flex;
+      gap: 0.4rem;
+      margin: 0.3rem 0;
+    }
+    .mini-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .add-to-cart {
+      background: #1c4770;
+      color: white;
+      border: none;
+      border-radius: 60px;
+      padding: 0.8rem 0.5rem;
+      font-weight: 600;
+      margin-top: 0.8rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .add-to-cart:hover {
+      background: #0c3152;
+    }
+
+    /* footer / result summary */
+    .result-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #cddef5;
+    }
+    .showing {
+      color: #315b82;
+    }
+    .pagination {
+      display: flex;
+      gap: 0.6rem;
+    }
+    .page-btn {
+      background: white;
+      border: 1px solid #d2e2f5;
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #1f4b78;
+      cursor: pointer;
+    }
+    .page-btn.active {
+      background: #1f4b78;
+      color: white;
+      border: none;
+    }
+
+    /* responsive */
+    @media (max-width: 1000px) {
+      .shop-layout {
+        grid-template-columns: 260px 1fr;
+      }
+    }
+    @media (max-width: 750px) {
+      .shop-layout {
+        grid-template-columns: 1fr;
+      }
+      .filter-sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shop-container">
+    <!-- header with identity & view toggles -->
+    <header class="shop-header">
+      <h1>filtered·commerce<span style="font-size: 1.8rem; margin-left: 8px;">🛒</span></h1>
+      <div class="view-options">
+        <button class="view-btn active">grid</button>
+        <button class="view-btn">list</button>
+        <button class="view-btn">compact</button>
+      </div>
+    </header>
+
+    <!-- main layout: filter sidebar + product grid -->
+    <div class="shop-layout">
+      <!-- FILTER SIDEBAR (advanced) -->
+      <aside class="filter-sidebar">
+        <div class="filter-header">
+          <h3>🔍 filters</h3>
+          <button class="clear-all" id="clearAllBtn">clear all</button>
+        </div>
+
+        <!-- 1. PRICE RANGE filter -->
+        <section class="filter-section">
+          <div class="filter-title">💰 price range</div>
+          <div class="price-range-display">
+            <span>$25</span> – <span>$350</span>
+          </div>
+          <div class="range-slider">
+            <div class="range-fill" style="left: 15%; width: 70%;"></div> <!-- simulated -->
+          </div>
+          <div class="price-inputs">
+            <div class="price-input"><span>$</span><input type="number" value="25" min="0" max="1000" step="5"></div>
+            <div class="price-input"><span>$</span><input type="number" value="350" min="0" max="1000" step="5"></div>
+          </div>
+        </section>
+
+        <!-- 2. COLOR PALETTE (grid) -->
+        <section class="filter-section">
+          <div class="filter-title">🎨 color palette</div>
+          <div class="color-grid" id="colorPalette">
+            <!-- filled via JS / static but functional demo (already selected simulation) -->
+            <div class="color-swatch selected" data-color="black"><div class="swatch-circle" style="background:#222;"></div><span class="swatch-label">black</span></div>
+            <div class="color-swatch" data-color="white"><div class="swatch-circle" style="background:#f0f0f0; border:1px solid #aaa;"></div><span class="swatch-label">white</span></div>
+            <div class="color-swatch" data-color="navy"><div class="swatch-circle" style="background:#13294b;"></div><span class="swatch-label">navy</span></div>
+            <div class="color-swatch" data-color="red"><div class="swatch-circle" style="background:#b22222;"></div><span class="swatch-label">red</span></div>
+            <div class="color-swatch" data-color="green"><div class="swatch-circle" style="background:#2e6b2e;"></div><span class="swatch-label">green</span></div>
+            <div class="color-swatch" data-color="blue"><div class="swatch-circle" style="background:#1f4e8a;"></div><span class="swatch-label">blue</span></div>
+            <div class="color-swatch" data-color="beige"><div class="swatch-circle" style="background:#dbb88c;"></div><span class="swatch-label">beige</span></div>
+            <div class="color-swatch" data-color="pink"><div class="swatch-circle" style="background:#e6a8d7;"></div><span class="swatch-label">pink</span></div>
+          </div>
+          <p style="font-size:0.8rem; margin-top:0.5rem; color:#506e90;">click swatch to select (multi)</p>
+        </section>
+
+        <!-- 3. BRAND SELECTION (with counts) -->
+        <section class="filter-section">
+          <div class="filter-title">🏷️ brand</div>
+          <div class="brand-list">
+            <label class="brand-item"><input type="checkbox" checked> Nike <span class="brand-count">(24)</span></label>
+            <label class="brand-item"><input type="checkbox"> Adidas <span class="brand-count">(18)</span></label>
+            <label class="brand-item"><input type="checkbox"> Puma <span class="brand-count">(12)</span></label>
+            <label class="brand-item"><input type="checkbox" checked> New Balance <span class="brand-count">(9)</span></label>
+            <label class="brand-item"><input type="checkbox"> Reebok <span class="brand-count">(7)</span></label>
+            <label class="brand-item"><input type="checkbox"> Vans <span class="brand-count">(14)</span></label>
+            <label class="brand-item"><input type="checkbox"> Under Armour <span class="brand-count">(5)</span></label>
+            <label class="brand-item"><input type="checkbox"> ASICS <span class="brand-count">(8)</span></label>
+          </div>
+        </section>
+
+        <!-- 4. CUSTOMER RATINGS (star radio) -->
+        <section class="filter-section">
+          <div class="filter-title">⭐ customer ratings</div>
+          <div class="rating-list">
+            <label class="rating-option"><input type="radio" name="rating" value="5"> <span class="stars">★★★★★</span> <span class="rating-label">5 stars (78)</span></label>
+            <label class="rating-option"><input type="radio" name="rating" value="4" checked> <span class="stars">★★★★☆<span class="inactive">★</span></span> <span class="rating-label">4 & up (154)</span></label>
+            <label class="rating-option"><input type="radio" name="rating" value="3"> <span class="stars">★★★☆☆<span class="inactive">★★</span></span> <span class="rating-label">3 & up (221)</span></label>
+            <label class="rating-option"><input type="radio" name="rating" value="2"> <span class="stars">★★☆☆☆<span class="inactive">★★★</span></span> <span class="rating-label">2 & up (276)</span></label>
+            <label class="rating-option"><input type="radio" name="rating" value="1"> <span class="stars">★☆☆☆☆<span class="inactive">★★★★</span></span> <span class="rating-label">1 & up (312)</span></label>
+          </div>
+        </section>
+
+        <!-- active filter summary (tiny) -->
+        <div style="font-size:0.85rem; background:#e6f0fe; border-radius: 40px; padding:0.6rem 1rem; margin-top:0.5rem;">
+          ⚡ active: <span id="activeFilters">price $25–$350, navy/black, Nike+NB, 4★</span>
+        </div>
+      </aside>
+
+      <!-- PRODUCT GRID (cards with colors, brands, prices, ratings) -->
+      <main class="product-grid" id="productGrid">
+        <!-- product 1 -->
+        <article class="product-card">
+          <div class="product-image">👟</div>
+          <div class="product-brand">NIKE</div>
+          <div class="product-title">Air Max Pulse</div>
+          <div class="product-rating"><span class="stars-small">★★★★☆</span><span class="reviews">(124)</span></div>
+          <div class="product-price">$129</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#222;"></span><span class="mini-swatch" style="background:#f0f0f0;"></span><span class="mini-swatch" style="background:#13294b;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">🧥</div>
+          <div class="product-brand">NEW BALANCE</div>
+          <div class="product-title">Classic Hoodie</div>
+          <div class="product-rating"><span class="stars-small">★★★★★</span><span class="reviews">(89)</span></div>
+          <div class="product-price">$79</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#2e6b2e;"></span><span class="mini-swatch" style="background:#13294b;"></span><span class="mini-swatch" style="background:#dbb88c;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">🎒</div>
+          <div class="product-brand">PUMA</div>
+          <div class="product-title">Phase Backpack</div>
+          <div class="product-rating"><span class="stars-small">★★★☆☆</span><span class="reviews">(42)</span></div>
+          <div class="product-price">$59</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#1f4e8a;"></span><span class="mini-swatch" style="background:#222;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">🧢</div>
+          <div class="product-brand">ADIDAS</div>
+          <div class="product-title">Cushion Cap</div>
+          <div class="product-rating"><span class="stars-small">★★★★☆</span><span class="reviews">(217)</span></div>
+          <div class="product-price">$34</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#b22222;"></span><span class="mini-swatch" style="background:#13294b;"></span><span class="mini-swatch" style="background:#f0f0f0;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">⌚</div>
+          <div class="product-brand">ASICS</div>
+          <div class="product-title">Chrono Runner</div>
+          <div class="product-rating"><span class="stars-small">★★★★☆</span><span class="reviews">(63)</span></div>
+          <div class="product-price">$189</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#1f4e8a;"></span><span class="mini-swatch" style="background:#2e6b2e;"></span><span class="mini-swatch" style="background:#222;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">👖</div>
+          <div class="product-brand">UNDER ARMOUR</div>
+          <div class="product-title">Tech Joggers</div>
+          <div class="product-rating"><span class="stars-small">★★★☆☆</span><span class="reviews">(33)</span></div>
+          <div class="product-price">$67</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#222;"></span><span class="mini-swatch" style="background:#13294b;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">🧦</div>
+          <div class="product-brand">VANS</div>
+          <div class="product-title">Stripe Crew Socks (3pk)</div>
+          <div class="product-rating"><span class="stars-small">★★★★★</span><span class="reviews">(412)</span></div>
+          <div class="product-price">$22</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#f0f0f0;"></span><span class="mini-swatch" style="background:#e6a8d7;"></span><span class="mini-swatch" style="background:#b22222;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+
+        <article class="product-card">
+          <div class="product-image">🕶️</div>
+          <div class="product-brand">REEBOK</div>
+          <div class="product-title">Aviator Sunnies</div>
+          <div class="product-rating"><span class="stars-small">★★★★☆</span><span class="reviews">(58)</span></div>
+          <div class="product-price">$94</div>
+          <div class="product-colors"><span class="mini-swatch" style="background:#222;"></span><span class="mini-swatch" style="background:#1f4e8a;"></span></div>
+          <button class="add-to-cart">add to cart</button>
+        </article>
+      </main>
+    </div>
+
+    <!-- result footer -->
+    <footer class="result-footer">
+      <div class="showing">showing <strong>1–8</strong> of 142 products</div>
+      <div class="pagination">
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">›</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- tiny interactive script to simulate filter changes (clear & visual feedback) -->
+  <script>
+    (function() {
+      const clearBtn = document.getElementById('clearAllBtn');
+      const activeSpan = document.getElementById('activeFilters');
+      
+      // color swatch selection toggle
+      const swatches = document.querySelectorAll('.color-swatch');
+      swatches.forEach(sw => {
+        sw.addEventListener('click', (e) => {
+          e.preventDefault();
+          sw.classList.toggle('selected');
+          updateActiveFilterText();
+        });
+      });
+
+      // brand checkboxes
+      const brandChecks = document.querySelectorAll('.brand-list input[type=checkbox]');
+      brandChecks.forEach(cb => cb.addEventListener('change', updateActiveFilterText));
+
+      // rating radios
+      const ratingRadios = document.querySelectorAll('input[name="rating"]');
+      ratingRadios.forEach(r => r.addEventListener('change', updateActiveFilterText));
+
+      // price inputs (min / max) 
+      const minInput = document.querySelector('.price-input:first-child input');
+      const maxInput = document.querySelector('.price-input:last-child input');
+      minInput.addEventListener('input', updateActiveFilterText);
+      maxInput.addEventListener('input', updateActiveFilterText);
+
+      // clear all functionality (demo)
+      clearBtn.addEventListener('click', () => {
+        // reset color swatches: remove selected from all except maybe first?
+        swatches.forEach(s => s.classList.remove('selected'));
+        // set first two for demo? we'll just set none to show cleared state.
+        // brand checks: uncheck all
+        brandChecks.forEach(cb => cb.checked = false);
+        // rating: set to default 4 star? or uncheck? we'll set 4 star (index 1)
+        ratingRadios[1].checked = true; // 4&up
+        // price set to default 25-350
+        minInput.value = 25;
+        maxInput.value = 350;
+        // update text
+        updateActiveFilterText();
+      });
+
+      function updateActiveFilterText() {
+        // gather selected colors
+        const selectedColors = Array.from(swatches).filter(s => s.classList.contains('selected')).map(s => s.dataset.color || s.innerText.trim().split('\n')[0]);
+        const colorStr = selectedColors.length ? selectedColors.join(', ') : 'any color';
+
+        // brands checked
+        const selectedBrands = Array.from(brandChecks).filter(cb => cb.checked).map(cb => {
+          const label = cb.closest('.brand-item')?.innerText?.trim() || '';
+          return label.split(' ')[0]; // crude brand name
+        });
+        const brandStr = selectedBrands.length ? selectedBrands.join('+') : 'any brand';
+
+        // rating
+        let ratingStr = '';
+        const checkedRating = document.querySelector('input[name="rating"]:checked');
+        if (checkedRating) {
+          const val = checkedRating.value;
+          ratingStr = val + '★' + (val !== '1' ? ' & up' : '');
+        } else {
+          ratingStr = 'any rating';
+        }
+
+        // price
+        const minV = minInput.value || '25';
+        const maxV = maxInput.value || '350';
+        const priceStr = `$${minV}–$${maxV}`;
+
+        activeSpan.innerText = `${priceStr}, ${colorStr}, ${brandStr}, ${ratingStr}`;
+      }
+
+      // initial call
+      updateActiveFilterText();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>blog·sphere · media‑rich platform</title>
+  <style>
+    /* ----- base : calm, readable, media-friendly ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f9ff;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1a2b3e;
+      line-height: 1.6;
+      padding: 2rem 1.2rem;
+    }
+
+    .blog-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    /* ----- global header (blog identity) ----- */
+    .blog-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffffdb;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 1rem 2.2rem;
+      border-radius: 80px;
+      border: 1px solid #e1ecfe;
+      box-shadow: 0 8px 18px -6px rgba(0,40,100,0.12);
+    }
+
+    .logo-area {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #164863, #2b5a8c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-area span {
+      background: none;
+      -webkit-text-fill-color: #1e4f7a;
+      font-size: 1.8rem;
+    }
+
+    .blog-nav {
+      display: flex;
+      gap: 2.2rem;
+      font-weight: 500;
+    }
+    .blog-nav a {
+      text-decoration: none;
+      color: #1f3b5c;
+      transition: color 0.15s;
+      font-size: 1.1rem;
+    }
+    .blog-nav a:hover {
+      color: #0077be;
+    }
+
+    /* ----- main two‑column layout: content + featured media column ----- */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* --- left column: stream of blog articles --- */
+    .article-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* blog post card (semantic article) */
+    .blog-post {
+      background: white;
+      border-radius: 2rem;
+      padding: 2rem 2rem 1.8rem;
+      box-shadow: 0 12px 28px -8px rgba(0, 35, 70, 0.08);
+      border: 1px solid #dde9fc;
+      transition: box-shadow 0.2s;
+    }
+    .blog-post:hover {
+      box-shadow: 0 24px 40px -12px rgba(0,100,200,0.18);
+    }
+
+    .post-header {
+      margin-bottom: 1.2rem;
+    }
+    .post-header h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #10365e;
+      letter-spacing: -0.01em;
+    }
+    .post-meta {
+      display: flex;
+      gap: 1.2rem;
+      color: #527895;
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .post-meta time, .post-meta .author {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .blog-post p {
+      color: #253c54;
+      margin: 1rem 0 1.5rem 0;
+      font-size: 1.08rem;
+    }
+
+    /* --- inline media example: audio player inside article --- */
+    .audio-block {
+      background: #eaf2fd;
+      border-radius: 2rem;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0 0.8rem;
+      border: 1px solid #c3dafe;
+    }
+    .audio-block h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+      color: #0b4770;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    /* native audio player styling (light touch) */
+    audio {
+      width: 100%;
+      height: 44px;
+      border-radius: 40px;
+      background: #ffffff;
+      border: 1px solid #b6d0ea;
+    }
+
+    /* ----- right column : video showcase + extra media ----- */
+    .media-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      position: sticky;
+      top: 2rem;
+    }
+
+    /* video card */
+    .video-card {
+      background: #0f263b;
+      border-radius: 2rem;
+      padding: 1.8rem 1.5rem 1.8rem;
+      color: white;
+      border: 1px solid #2c506e;
+      box-shadow: 0 30px 30px -15px rgba(0,0,0,0.3);
+    }
+
+    .video-card h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #d6ebff;
+    }
+
+    /* video container with streaming api simulation (native controls) */
+    .video-wrapper {
+      border-radius: 24px;
+      overflow: hidden;
+      background: black;
+      margin: 1rem 0 0.8rem;
+      border: 2px solid #3c6488;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #0b1a2a;
+    }
+
+    /* video metadata / fake streaming info */
+    .stream-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #9bbbe0;
+      margin-top: 1rem;
+    }
+    .live-badge {
+      background: #c72a2a;
+      color: white;
+      padding: 0.2rem 1rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    /* small audio playlist / additional media cards */
+    .podcast-card {
+      background: #ffffff;
+      border-radius: 2rem;
+      padding: 1.5rem;
+      border: 1px solid #d6e5ff;
+    }
+    .podcast-card h3 {
+      font-size: 1.4rem;
+      color: #123f61;
+      margin-bottom: 1rem;
+    }
+
+    .track-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px dashed #b9d2f0;
+    }
+    .track-item:last-child {
+      border-bottom: none;
+    }
+    .track-item .track-info {
+      flex: 1;
+    }
+    .track-info .title {
+      font-weight: 600;
+      color: #16455f;
+    }
+    .track-info .duration {
+      font-size: 0.85rem;
+      color: #5e7e9f;
+    }
+    /* mini audio player for each track (but we reuse native controls) */
+    .track-item audio {
+      width: 140px;
+      height: 40px;
+    }
+
+    /* comment / engagement section inside left column (bonus) */
+    .comments-area {
+      background: #f3f8fe;
+      border-radius: 2rem;
+      padding: 1.8rem 2rem;
+      border: 1px solid #ccdefa;
+    }
+    .comments-area h3 {
+      font-size: 1.4rem;
+      color: #123456;
+      margin-bottom: 0.8rem;
+    }
+    .comment {
+      display: flex;
+      gap: 1rem;
+      margin: 1.2rem 0;
+    }
+    .comment-avatar {
+      width: 42px;
+      height: 42px;
+      background: #27638c;
+      border-radius: 60px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .comment-body {
+      background: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 1.5rem;
+      flex: 1;
+      border: 1px solid #d0e2ff;
+    }
+    .comment-author {
+      font-weight: 700;
+      color: #0b3f62;
+    }
+    .comment-time {
+      font-size: 0.8rem;
+      color: #677f9e;
+      margin-left: 1rem;
+    }
+
+    /* footer */
+    .blog-footer {
+      text-align: center;
+      border-top: 2px solid #c8ddfa;
+      padding-top: 2rem;
+      margin-top: 1rem;
+      color: #3f6082;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-links a {
+      margin-left: 2rem;
+      color: #2b557a;
+      text-decoration: none;
+    }
+
+    /* responsive behavior */
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .media-sidebar {
+        position: static;
+      }
+      .blog-header {
+        border-radius: 40px;
+      }
+      .track-item audio {
+        width: 120px;
+      }
+    }
+
+    /* small utilities */
+    .icon {
+      font-size: 1.3rem;
+    }
+    figcaption {
+      font-size: 0.85rem;
+      color: #4b6f90;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="blog-container">
+
+    <!-- semantic blog header with navigation -->
+    <header class="blog-header">
+      <div class="logo-area">
+        <span>◉</span> blog·sphere<span style="font-size:1.2rem; margin-left:4px;">🎙️</span>
+      </div>
+      <nav class="blog-nav">
+        <a href="#">home</a>
+        <a href="#">stream</a>
+        <a href="#">podcasts</a>
+        <a href="#">videos</a>
+        <a href="#">about</a>
+      </nav>
+    </header>
+
+    <!-- main grid: left feed (articles) + right media sidebar -->
+    <div class="content-grid">
+
+      <!-- LEFT COLUMN: blog article feed (content-driven) -->
+      <section class="article-feed">
+        <!-- first blog post: includes audio playback -->
+        <article class="blog-post">
+          <header class="post-header">
+            <h2>Mixing code & rhythms</h2>
+            <div class="post-meta">
+              <span class="author">👤 Elena M.</span>
+              <time datetime="2026-02-23">📅 23 feb 2026</time>
+              <span>☕ 6 min read</span>
+            </div>
+          </header>
+          <p>
+            In today's digital narrative, embedding audio enriches the story. Below you can hear the 
+            field recording that inspired this post — a perfect blend of content and media.
+          </p>
+          <!-- inline audio player with controls (MP3 as sample - using silent/dummy but real controls) -->
+          <div class="audio-block">
+            <h3>🎧  ambient field recording</h3>
+            <audio controls aria-label="audio player with playback controls">
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+            <figcaption>Ambient loop · streaming via HTML5 audio controls</figcaption>
+          </div>
+          <p>
+            The audio element provides play/pause, seek, volume, and download if allowed. 
+            All native controls are accessible.
+          </p>
+        </article>
+
+        <!-- second blog post: discusses video streaming, plus internal podcast snippet -->
+        <article class="blog-post">
+          <header class="post-header">
+            <h2>Streaming live from the studio</h2>
+            <div class="post-meta">
+              <span class="author">👤 David K.</span>
+              <time datetime="2026-02-22">📅 22 feb 2026</time>
+              <span>🎥 video featured</span>
+            </div>
+          </header>
+          <p>
+            We’ve integrated a live video stream (simulated via HLS-like native playback). 
+            The video on the right sidebar is part of today’s stream. You can control playback, 
+            full‑screen, and volume.
+          </p>
+          <!-- small audio-only block inside second article (extra media) -->
+          <div class="audio-block" style="background:#e9effa;">
+            <h3>🔊  interview excerpt (audio)</h3>
+            <audio controls>
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+          <p>
+            With native audio controls, users can pause, scrub, and adjust volume — 
+            essential for a content-driven blog with media at its heart.
+          </p>
+        </article>
+
+        <!-- third blog post: comments and engagement example -->
+        <article class="blog-post">
+          <header class="post-header">
+            <h2>Community & media interaction</h2>
+            <div class="post-meta">
+              <span class="author">👤 Samira L.</span>
+              <time datetime="2026-02-21">📅 21 feb 2026</time>
+            </div>
+          </header>
+          <p>
+            Readers can discuss media episodes right here. The comment section below 
+            shows how a blog feels alive with community feedback.
+          </p>
+          <!-- mini comment preview -->
+          <div class="comments-area">
+            <h3>💬 recent comments</h3>
+            <div class="comment">
+              <div class="comment-avatar">AJ</div>
+              <div class="comment-body">
+                <span class="comment-author">Alex J. <span class="comment-time">2h ago</span></span>
+                <p>Love the new audio player – much cleaner.</p>
+              </div>
+            </div>
+            <div class="comment">
+              <div class="comment-avatar">ML</div>
+              <div class="comment-body">
+                <span class="comment-author">Maya Liu <span class="comment-time">5h ago</span></span>
+                <p>Is the video streaming in 4K? looked crisp.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- RIGHT COLUMN: sticky media sidebar (video + audio controls) -->
+      <aside class="media-sidebar">
+
+        <!-- VIDEO CARD : streaming video with native controls -->
+        <div class="video-card">
+          <h2><span class="icon">📺</span> live stream · global set</h2>
+          <div class="video-wrapper">
+            <!-- video element simulating streaming (using mp4 with controls) 
+                 'streaming capabilities' implied by seeking, buffering, etc. -->
+            <video controls poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%231a3f60'/%3E%3Ctext x='40' y='120' font-family='system-ui' font-size='22' fill='%23c9e2ff'%3E🎥 preview stream%3C/text%3E%3C/svg%3E">
+              <source src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4" type="video/mp4">
+              <!-- fallback: second source for compatibility -->
+              <source src="https://test-videos.co.uk/vids/bigbuckbunny/webm/vp8/1080/Big_Buck_Bunny_1080_10s_1MB.webm" type="video/webm">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="stream-info">
+            <span class="live-badge">🔴 LIVE</span>
+            <span>🎬 1080p · adaptive bitrate</span>
+            <span>👁️ 342 watching</span>
+          </div>
+          <p style="color:#c0d8f0; margin-top: 1rem; font-size:0.95rem;">
+            Full streaming controls: play/pause, timeline, volume, fullscreen. 
+            The video is H.264 MP4 (simulating a live stream).
+          </p>
+        </div>
+
+        <!-- PODCAST / AUDIO PLAYLIST CARD: multiple audio players -->
+        <div class="podcast-card">
+          <h3>🎙️ recent episodes</h3>
+          <div class="track-item">
+            <div class="track-info">
+              <span class="title">code & chill #42</span>
+              <div class="duration">34 min</div>
+            </div>
+            <audio controls>
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+          <div class="track-item">
+            <div class="track-info">
+              <span class="title">the component lifecycle</span>
+              <div class="duration">28 min</div>
+            </div>
+            <audio controls>
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+          <div class="track-item">
+            <div class="track-info">
+              <span class="title">streaming ux / ui</span>
+              <div class="duration">41 min</div>
+            </div>
+            <audio controls>
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+          <figcaption style="margin-top:1rem;">Each episode has its own audio controls · download disabled by default</figcaption>
+        </div>
+
+        <!-- extra small widget: upcoming streams (just decorative) -->
+        <div style="background: #dbeafe; border-radius: 2rem; padding: 1rem 1.5rem; border:1px solid #b7d0f3;">
+          <p style="font-weight:600;">⏳ next stream: <span style="color:#003c8b;">today 6pm GMT</span></p>
+          <p style="color:#2b4b74;">→ set reminder (audio / video both)</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- BLOG FOOTER with semantic links -->
+    <footer class="blog-footer">
+      <p>🎧 blog·sphere — content first, media always. © 2026</p>
+      <div class="footer-links">
+        <a href="#">privacy</a>
+        <a href="#">media policy</a>
+        <a href="#">accessibility</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

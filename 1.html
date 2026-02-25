@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>semantic layout lab · grid + fixed sidebar</title>
+  <style>
+    /* base & reset — minimal, only to support the layout demo */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f4f7fb;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      color: #1e293b;
+      padding: 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* main container uses grid to combine fixed sidebar + flexible main */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;  /* fixed sidebar | main content */
+      gap: 1.5rem;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* ---- fixed sidebar region (semantic <aside>) ---- */
+    .fixed-sidebar {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.02);
+      padding: 1.8rem 1.2rem;
+      height: fit-content;
+      position: sticky;
+      top: 1.5rem;
+      border: 1px solid #e9eef3;
+      transition: box-shadow 0.2s;
+    }
+
+    .fixed-sidebar:hover {
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    .sidebar-section {
+      margin-bottom: 2.2rem;
+    }
+
+    .sidebar-section h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #5f6c84;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-list li {
+      margin-bottom: 0.6rem;
+    }
+
+    .nav-list a {
+      display: block;
+      padding: 0.6rem 1rem;
+      background: #f8fafd;
+      border-radius: 14px;
+      color: #1e293b;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .nav-list a:hover {
+      background: #e6edf8;
+      border-color: #cbd5e1;
+      color: #0f1829;
+    }
+
+    .badge {
+      background: #d9e2ef;
+      color: #253649;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 30px;
+      margin-left: 0.5rem;
+      font-weight: 600;
+    }
+
+    /* ---- main content area (semantic <main>) ---- */
+    .main-content {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+      padding: 2rem 2rem 2.2rem 2rem;
+      border: 1px solid #edf2f7;
+    }
+
+    /* header inside main */
+    .page-header {
+      margin-bottom: 2.2rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(145deg, #1f2a48, #2d3b5a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.3rem;
+    }
+
+    .page-header p {
+      color: #59748f;
+      font-size: 1rem;
+    }
+
+    /* ----- multiple grid-based layouts inside <main> (semantic sections) ----- */
+    .layout-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 2.8rem;
+    }
+
+    /* each layout is a <section> with a heading */
+    .layout-section {
+      background: #fafcff;
+      border-radius: 24px;
+      padding: 1.8rem 1.8rem 2.2rem 1.8rem;
+      border: 1px solid #dee7f0;
+    }
+
+    .layout-section h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.3rem;
+      font-weight: 550;
+      color: #1d2b3f;
+      margin-bottom: 1.5rem;
+      border-left: 5px solid #4f7eb3;
+      padding-left: 1rem;
+    }
+
+    .layout-section h2 span {
+      background: #dce7f5;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      color: #264a74;
+    }
+
+    /* ---- GRID CARD LAYOUT (asymmetric multi-column) ---- */
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.4rem 1rem;
+      box-shadow: 0 4px 12px rgba(0, 10, 30, 0.03);
+      border: 1px solid #e2eaf2;
+      transition: 0.15s ease;
+    }
+
+    .card:hover {
+      border-color: #b9cfec;
+      box-shadow: 0 12px 22px -8px rgba(30, 60, 130, 0.15);
+    }
+
+    .card-icon {
+      font-size: 1.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #4e627c;
+    }
+
+    /* ---- GRID WITH FEATURED ITEM (explicit grid placement) ---- */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-auto-rows: minmax(100px, auto);
+      gap: 1.2rem;
+    }
+
+    .feature-item {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 1.4rem;
+      border: 1px solid #dde5ef;
+      background: #ffffff;
+    }
+
+    .feature-item.large {
+      grid-row: span 2;
+      background: #f4f9ff;
+      border-left: 3px solid #618fc7;
+    }
+
+    .feature-item h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feature-item p {
+      font-size: 0.9rem;
+      color: #3d506e;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.8rem;
+    }
+
+    .stat {
+      background: #e8f0fe;
+      border-radius: 40px;
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1f3a60;
+    }
+
+    /* ---- magazine / HOLY GRAIL inspired grid (three columns) ---- */
+    .magazine-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .mag-item {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 1.2rem;
+      border: 1px solid #e1eaf1;
+    }
+
+    .mag-item.wide {
+      grid-column: span 2;
+      background: #f5faff;
+    }
+
+    .mag-item h5 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: #0b1f33;
+    }
+
+    .meta {
+      color: #617e9c;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* ---- additional fixed/sidebar proof: micro layout inside article (grid + inline) ---- */
+    .nested-demo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .nested-card {
+      background: #eef4fa;
+      border-radius: 18px;
+      padding: 1rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccddec;
+    }
+
+    /* footer semantic tag inside main */
+    .main-footer {
+      margin-top: 2.5rem;
+      padding-top: 1.2rem;
+      border-top: 2px dashed #cdddec;
+      color: #62748b;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    /* ----- overall page footer (semantic <footer> global) ----- */
+    .global-footer {
+      max-width: 1440px;
+      margin: 2rem auto 0 auto;
+      width: 100%;
+      background: #dae5f2;
+      border-radius: 40px;
+      padding: 1.2rem 2rem;
+      text-align: center;
+      color: #2d405b;
+      font-size: 0.9rem;
+      border: 1px solid #b7cbdf;
+    }
+
+    /* responsive behaviour: stack on narrow screens */
+    @media (max-width: 780px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+      .fixed-sidebar {
+        position: static;
+        width: 100%;
+      }
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+      .magazine-grid {
+        grid-template-columns: 1fr;
+      }
+      .mag-item.wide {
+        grid-column: span 1;
+      }
+      .nested-demo {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* extra polish */
+    code {
+      background: #e9f0f8;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      color: #1e4c7a;
+    }
+
+    .fixed-sidebar code {
+      background: #dbe5f0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SEMANTIC GLOBAL LAYOUT: fixed-sidebar + grid-capable main using BODY as flex container -->
+  <div class="app-layout">
+    <!-- fixed sidebar (semantic ASIDE) -->
+    <aside class="fixed-sidebar">
+      <section class="sidebar-section">
+        <h3>🧭 navigation</h3>
+        <ul class="nav-list">
+          <li><a href="#">dashboard <span class="badge">grid</span></a></li>
+          <li><a href="#">analytics <span class="badge">fixed</span></a></li>
+          <li><a href="#">projects <span class="badge">8 layouts</span></a></li>
+          <li><a href="#">settings</a></li>
+          <li><a href="#">team</a></li>
+        </ul>
+      </section>
+
+      <section class="sidebar-section">
+        <h3>📌 pinned layouts</h3>
+        <ul class="nav-list">
+          <li><a href="#">asymmetric grid</a></li>
+          <li><a href="#">magazine holy</a></li>
+          <li><a href="#">featured + sidebar</a></li>
+        </ul>
+      </section>
+
+      <section class="sidebar-section">
+        <h3>⚙️ fixed area</h3>
+        <div style="background: #f0f6fe; border-radius: 18px; padding: 1rem; font-size: 0.9rem;">
+          <p style="margin-bottom: 0.5rem;">⏺️ Sticky sidebar<br><code>position: sticky</code></p>
+          <p>width: <strong>280px</strong><br> stays fixed while main scrolls</p>
+        </div>
+      </section>
+
+      <section class="sidebar-section">
+        <h3>🧩 tag cloud</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="background: #dfeaf5; padding: 0.3rem 1rem; border-radius: 30px;">#grid</span>
+          <span style="background: #dfeaf5; padding: 0.3rem 1rem; border-radius: 30px;">#flex</span>
+          <span style="background: #dfeaf5; padding: 0.3rem 1rem; border-radius: 30px;">#sidebar</span>
+          <span style="background: #dfeaf5; padding: 0.3rem 1rem; border-radius: 30px;">#semantic</span>
+          <span style="background: #dfeaf5; padding: 0.3rem 1rem; border-radius: 30px;">#header</span>
+        </div>
+      </section>
+    </aside>
+
+    <!-- main content area (semantic MAIN) where multiple grid configurations live -->
+    <main class="main-content">
+      <header class="page-header">
+        <h1>semantic layout lab</h1>
+        <p>grid playground + fixed sidebar using <code>&lt;aside&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;header&gt;</code>, <code>&lt;footer&gt;</code></p>
+      </header>
+
+      <!-- container for all grid-based layout demos -->
+      <div class="layout-showcase">
+        <!-- first layout: responsive card grid (auto-fit) -->
+        <section class="layout-section">
+          <h2>📐 responsive card grid <span>auto‑fit · minmax(200px,1fr)</span></h2>
+          <div class="grid-cards">
+            <article class="card">
+              <div class="card-icon">📁</div>
+              <h3>Projects</h3>
+              <p>12 active, grid-based cards adjust to width.</p>
+            </article>
+            <article class="card">
+              <div class="card-icon">📊</div>
+              <h3>Analytics</h3>
+              <p>As the container shrinks, cards wrap.</p>
+            </article>
+            <article class="card">
+              <div class="card-icon">⚙️</div>
+              <h3>Settings</h3>
+              <p>Semantic article tags inside a grid.</p>
+            </article>
+            <article class="card">
+              <div class="card-icon">📦</div>
+              <h3>Assets</h3>
+              <p>four items, but grid can take more.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- second layout: asymmetric grid with featured cell (explicit spans) -->
+        <section class="layout-section">
+          <h2>🌟 featured grid <span>2fr + 1fr+1fr / row span</span></h2>
+          <div class="feature-grid">
+            <article class="feature-item large">
+              <h4>⭐ featured insight</h4>
+              <p>This cell spans two rows using <code>grid-row: span 2</code>. Left column is 2fr, right columns are 1fr each. Perfect to highlight key content.</p>
+              <div class="stats">
+                <span class="stat">grid-area</span>
+                <span class="stat">spanning</span>
+              </div>
+            </article>
+            <article class="feature-item">
+              <h4>📈 traffic</h4>
+              <p>+23% this week</p>
+            </article>
+            <article class="feature-item">
+              <h4>🎯 goals</h4>
+              <p>78% achieved</p>
+            </article>
+            <article class="feature-item">
+              <h4>📋 tasks</h4>
+              <p>11 in progress</p>
+            </article>
+            <article class="feature-item">
+              <h4>🧪 experiments</h4>
+              <p>3 active</p>
+            </article>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem;"><code>grid-template-columns: 2fr 1fr 1fr;</code> → explicit asymmetric columns</p>
+        </section>
+
+        <!-- third layout: magazine style / three column + wide -->
+        <section class="layout-section">
+          <h2>🗞️ magazine grid <span>holly · wide card spans 2 columns</span></h2>
+          <div class="magazine-grid">
+            <article class="mag-item wide">
+              <h5>Semantic grid deep dive</h5>
+              <p class="meta">by layout team · 5 min read</p>
+              <p>This item uses <code>grid-column: span 2</code>. Combined with three‑column grid.</p>
+            </article>
+            <article class="mag-item">
+              <h5>fixed sidebar</h5>
+              <p class="meta">sticky aside</p>
+            </article>
+            <article class="mag-item">
+              <h5>card variants</h5>
+              <p class="meta">flexible</p>
+            </article>
+            <article class="mag-item">
+              <h5>nested grids</h5>
+              <p class="meta">see below</p>
+            </article>
+            <article class="mag-item">
+              <h5>html tags</h5>
+              <p class="meta">article, section</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- fourth layout: nested grid inside a section to show further flexibility -->
+        <section class="layout-section">
+          <h2>🪆 nested / micro‑grid <span>two-column inside a section</span></h2>
+          <div class="nested-demo">
+            <div class="nested-card">
+              <strong>⬜ left grid cell</strong> — also semantic, wrapped by <code>&lt;div&gt;</code> but children can be articles.
+            </div>
+            <div class="nested-card">
+              <strong>⬜ right cell</strong> — this entire showcase demonstrates multiple grid configurations inside one <code>&lt;main&gt;</code>.
+            </div>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; background: #e2ecf9; padding: 0.5rem 1rem; border-radius: 30px;">
+            ✅ every layout uses distinct grid definitions — all within semantic containers (sections, articles, header, footer).
+          </p>
+        </section>
+      </div>
+
+      <!-- footer inside main (semantic FOOTER) -->
+      <footer class="main-footer">
+        <span>🧪 <strong>grid configs:</strong> auto-fill · asymmetric · magazine · nested</span>
+        <span>⚡ <code>main + aside(fixed)</code></span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- global page footer (semantic FOOTER) -->
+  <footer class="global-footer">
+    <p><strong>semantic web interface</strong> — featuring <code>&lt;aside&gt;</code> fixed sidebar, <code>&lt;main&gt;</code> with multiple grid layouts, and <code>&lt;section&gt;</code>/<code>&lt;article&gt;</code> tags. Sticky sidebar, responsive grids, all built with semantic HTML5 + CSS grid.</p>
+  </footer>
+</body>
+</html>

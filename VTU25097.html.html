@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV</title>
+    <style>
+         * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            
+            background: linear-gradient(135deg, #ffffff, #79839c, #455558);
+        }
+
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            color: #262052;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            
+        }
+        .navbar h5{
+            cursor: pointer;
+        }
+        .adds img{
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .service{
+           border-radius: 15px;
+            padding: 20px 25px;
+            border: 5px solid rgba(69, 91, 122, 0.5);
+            height: auto;
+            width: 600px;
+            margin-left: 440px;
+            margin-top: 25px;
+        }
+         label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #d7ddf1;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #4b5563;
+            font-size: 13px;
+            background: #020617;
+            color: #e5e7eb;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #ffffff;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #bfe2f1;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+
+        .note {
+            font-size: 11px;
+            color: #ffffff;
+        }
+        button {
+            margin-top: 5px;
+            background: linear-gradient(135deg, #9ac2dc, #b2d7dc);
+            color: #0f172a;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h2>Commercial Vehicle Service</h2>
+        <h5>Home</h5>
+        <h5>Service</h5>
+        <h5>Contact</h5>
+    </nav>
+    <section class="adds">
+        <img src="./Ms-service-web-banner_1366x400_02.png" alt="">
+    </section>
+    <section class="service">
+        <h3>Book Your Car Service</h3>
+        <h5>You can book your car service appointment online by entering your details below</h5>
+        <div class="form-group">
+                <label for="cus_name">Full Name</label>
+                <input type="text" id="cus_name" name="cus_name"
+                       placeholder="Enter your full name" required>
+        </div>
+        <div class="form-group">
+                    <label for="reg_id">Registration ID</label>
+                    <input type="number" id="reg_id" name="reg_id"
+                           placeholder="e.g. 101" required>
+        </div>
+        <div class="form-group">
+                    <label for="contact">Contact Number</label>
+                    
+                    <input type="tel" id="contact" name="contact"
+                           pattern="[987][0-9]{9}"
+                           placeholder="8074702398"
+                           required>
+                    
+        </div>
+        <div class="form-group">
+                <label for="location">Location / Address</label>
+                <textarea id="location" name="location" rows="3"
+                          placeholder="Street, city, landmark" required></textarea>
+        </div>
+        <div class="form-group">
+                    <label for="dod">Date of Registration</label>
+                    <input type="date" id="dod" name="dod">
+                </div>
+            </div>
+
+        <button type="submit">Register Customer</button>
+    </section>
+    <div class="service" >
+        <h2>Book Vehicle Service</h2>
+
+        <form id="bookingForm" method="post" action="book_service.php">
+            <div class="form-group">
+                <label for="cus_reg_id">Customer Reg ID</label>
+                
+                <input type="number" id="cus_reg_id" name="cus_reg_id"
+                       placeholder="Your registration ID" required>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="vehicle_no">Vehicle Number</label>
+                    <input type="text" id="vehicle_no" name="vehicle_no"
+                           placeholder="TN-00-AB-0000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicle_type">Vehicle Type</label>
+                    <select id="vehicle_type" name="vehicle_type" required>
+                        <option value="">--Select--</option>
+                        <option value="Truck">Truck</option>
+                        <option value="Bus">Bus</option>
+                        <option value="Mini Van">Mini Van</option>
+                        <option value="Lorry">Lorry</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="service_type">Service Type</label>
+                <select id="service_type" name="service_type" required>
+                    <option value="">--Select Service--</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Repair">Repair</option>
+                    <option value="Full Service">Full Service</option>
+                    <option value="Oil Change">Oil Change</option>
+                    <option value="Brake Check">Brake Check</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="service_date">Preferred Date</label>
+                    <input type="date" id="service_date" name="service_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Estimated Amount (₹)</label>
+                    
+                    <input type="number" id="amount" name="amount"
+                           min="0" step="0.01"
+                           placeholder="e.g. 1500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="remarks">Remarks (Problem Description)</label>
+                <textarea id="remarks" name="remarks" rows="3"
+                          placeholder="Describe issues or special requests"></textarea>
+            </div>
+
+            <button type="submit">Book Service</button>
+        </form>
+    </div>
+</body>
+</html>
